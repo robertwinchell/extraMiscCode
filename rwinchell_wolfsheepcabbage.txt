@@ -1,0 +1,115 @@
+mtype ={wolf,sheep,cabbage};
+/*left bank array*/
+mtype leftBankArr[4];
+/*right bank array*/
+mtype rightBankArr[4];
+	/*There are 4 slots on each bank because it is possible to not pick up an item/have an empty one*/
+chan river =[0] of {mtype}
+bool leftBank;
+bool riddlesolved=false;
+mtype selectedObject;
+proctype pickAnObject(){
+	bool s;
+	selectObject:
+	/*select from input array and set that to selected object*/
+	s = true;
+	if	/*if on the left bank pick an item from there, same for right*/
+		::leftBank->if
+				::s->selectedObject=leftBankArr[0];
+					leftBankArr[0] = leftBankArr[3];
+					s = false;
+				::s->selectedObject=leftBankArr[1];
+					leftBankArr[1] = leftBankArr[3];
+					s = false;
+				::s->selectedObject=leftBankArr[2];
+					leftBankArr[2] = leftBankArr[3];
+					s = false;
+				::s->selectedObject=leftBankArr[3];
+					s = false;
+				::else->skip;
+				
+			fi;
+		::else->if
+				::s->selectedObject=rightBankArr[0];
+					rightBankArr[0] = rightBankArr[3];
+					s = false;
+				::s->selectedObject=rightBankArr[1];
+					rightBankArr[1] = rightBankArr[3];
+					s = false;
+				::s->selectedObject=rightBankArr[2];
+					rightBankArr[1] = rightBankArr[3];
+					s = false;
+				::s->selectedObject=rightBankArr[3];
+					s = false;
+				::else->skip;
+			fi;
+	fi;
+	
+
+	/*check types being left behind, if wolf/sheep or cabbage/sheep, select again or break*/
+	/*if
+		::(!leftBank && rightBankArr[0]==wolf && rightBankArr[1]==sheep)->goto selectObject;;
+		::(!leftBank && rightBankArr[1]==sheep && rightBankArr[2]==cabbage)->goto selectObject;
+		::(leftBank && leftBankArr[1]==sheep && leftBankArr[2]==cabbage)->goto selectObject; 
+		::(leftBank && rightBankArr[0]==wolf && rightBankArr[1]==sheep)->goto selectObject;
+		::else->run crossRiver(selectedObject); 
+	fi;*/
+	
+	
+	/*cross river with object*/
+	run crossRiver();
+	
+	
+}
+
+proctype crossRiver(){
+	/*switch banks*/
+	if
+		::leftBank -> leftBank = false;river!selectedObject;
+		::else->leftBank = true;river!selectedObject;
+	fi;
+	
+
+	/*add selected item to river channel*/
+	/*river!selected;*/
+	/*run dropObject();*/
+	progress:
+	/*add item from channel to opposite bank*/
+	if
+		::leftBank->
+			if
+				::river?cabbage->leftBankArr[2]=cabbage;
+				::river?sheep-> leftBankArr[1]=sheep;
+				::river?wolf-> leftBankArr[0]=wolf;
+			fi;
+		::else->
+			if
+				::river?cabbage->rightBankArr[2]=cabbage;
+				::river?sheep-> rightBankArr[1]=sheep;
+				::river?wolf-> rightBankArr[0]=wolf;
+			fi;
+	fi;
+	
+	/*assert if right array has all 3 objects*/
+	if
+		::(rightBankArr[0]==wolf && rightBankArr[1]==sheep && rightBankArr[2]==cabbage)->riddlesolved=true;assert(riddlesolved);
+		::else->run pickAnObject();/*otherwise start again*/
+	fi;
+
+}
+
+
+init{
+/*add objects to left bank array and set leftBank to true*/
+	leftBank = true;
+	leftBankArr[0]=wolf;
+	leftBankArr[1]=sheep;
+	leftBankArr[2]=cabbage;
+
+	run pickAnObject();
+
+	
+	
+
+}
+

@@ -1,0 +1,9 @@
+chan global = [0] of {byte}
+
+proctype sender(){
+
+}
+
+proctype receiver(){
+
+}

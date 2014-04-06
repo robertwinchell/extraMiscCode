@@ -1,0 +1,88 @@
+########################
+# Global configuration #
+########################
+
+[Global]
+PrjFileVer       = 1.1
+Description      = "SPI Wizard generated configuration."
+OutputFile       = "C:\Users\Zach\Downloads\testSPI.out"
+AppendOutputFile = false
+ClockSource      = Internal
+
+#############################
+# Initial state definitions #
+#############################
+
+[Initial]
+SCLK      = Running
+MOSI      = 1
+MISO      = High-Z
+WE        = 0
+SS0       = 1
+SS1       = 1
+SS2       = 1
+SS3       = 1
+OpenDrain = NNNNNNNN NNNNNNNN
+Q         = 00000000
+
+##########################
+# SPI Device definitions #
+##########################
+
+[Spi4Device]
+Label             = "Device 1"
+Id                = 65536
+ClockDiv          = 1
+ClockActiveState  = Running
+ClockIdleLevel    = Running
+ClockDrivingEdge  = Rising
+ClockSamplingEdge = Rising
+SSIdleLevel       = 1
+SSStartPhase      = 0
+SSStopPhase       = 0
+OpenDrain         = NNNNNNNN
+Length            = 8
+BitOrder          = MSBitFirst
+ByteOrder         = MSByteFirst
+
+##################################
+# Standard SPI macro definitions #
+##################################
+
+[SpiStandard]
+Label    = "Standard Macro 1"
+Id       = 131072
+Device   = "Device 1"
+SlaveNr  =  0
+
+###########################
+# SPI segment definitions #
+###########################
+
+################################
+# Custom SPI macro definitions #
+################################
+
+###########################
+# GPO segment definitions #
+###########################
+
+#########################
+# GPO macro definitions #
+#########################
+
+##########################
+# SPI Program definition #
+##########################
+
+[SpiProgram]
+Label   = "SpiProgram"
+Trigger = Disabled NotSlaving UUUUUUUU
+Macro   = "Standard Macro 1" data 12
+Macro   = "Standard Macro 1" data 34
+Macro   = "Standard Macro 1" data 56
+
+##########################
+# GPO Program definition #
+##########################
+

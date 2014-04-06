@@ -1,0 +1,1 @@
+The exercise is successful with both weak fairness allowed and not allowed I believe because of the progress label.  When I removed the label in iSpin it failed the fairness

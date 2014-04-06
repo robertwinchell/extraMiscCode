@@ -1,0 +1,104 @@
+
+/*This store has 2 items that customers pic non deterministically, it then checks inventory and availability and payment then ships*/
+chan pantsStore = [0] of {byte};
+chan payment = [0] of {bool};
+chan shipping = [0] of {byte};
+byte item1inventory = 10;
+byte item2inventory = 10;
+bool canPay;
+bool item1available;
+bool item2available;
+
+proctype clothingStore(byte item){
+	startA:
+	/*FIrst add the stock to the store, this could/should be moved to a different process*/
+	do
+		::item1inventory > 0 ->
+		pantsStore!1;
+		item1inventory--;
+		item1available = true;
+		::item2inventory > 0 ->
+		pantsStore!2;
+		item2inventory--;
+		 item2available=true;
+		
+	
+	od;	
+	
+
+	if
+		::item == 1 ->/*check availability in channel here*/ 
+		checkItem1:
+		if
+			::pantsStore?1;
+			run buyItem1(canPay);
+			::pantsStore?2;
+			/*The wrong item was pulled and must be put back*/
+			pantsStore!2;
+			goto checkItem1;
+		fi;
+		::item == 2 ->
+		checkItem2:
+		if
+			::pantsStore?2;
+			run buyItem2(canPay);
+			::pantsStore?1;
+			/*The wrong item was pulled and must be put back*/
+			pantsStore!1;
+			goto checkItem2;
+		fi;
+		::skip;
+	fi;
+	
+	
+}
+
+proctype buyItem1(bool paymentSuccess){
+		(item1available);
+
+	if
+		::paymentSuccess->
+		payment!1;
+		run shipItem(1);
+		::else -> skip;
+			
+	fi;
+	
+}
+proctype buyItem2(bool paymentSuccess){
+		(item2available);
+
+	if
+		::paymentSuccess->
+		payment!2;
+		run shipItem(1);
+		::else -> skip;
+			
+	fi;
+	
+}
+
+proctype shipItem(byte itemType){
+/*writes a 1 if item shipped is item 1 and 2 if its item 2*/
+	shipping!itemType;	
+}
+/*Sometimes they can pay sometimes they can't*/
+proctype customerA() {
+	if
+		::true->canPay=true;
+		::true->canPay=false;
+	fi;
+	run clothingStore(1);
+
+}
+proctype customerB() {
+	if
+		::true->canPay=true;
+		::true->canPay=false;
+	fi;
+	run clothingStore(2);
+}
+
+init{atomic{run customerB(); run customerA();}}
+
+

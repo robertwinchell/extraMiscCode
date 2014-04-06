@@ -1,0 +1,23 @@
+/* erroneous solution of mutex */
+
+byte my_number = 0;
+
+proctype process1()
+{
+	start1:
+	if
+		::my_number < 255 -> my_number++;
+	fi;
+	goto start1
+}
+
+proctype process2()
+{
+	start2:
+	if
+		::my_number > 0 -> my_number--;
+	fi;
+	goto start2
+}
+
+init { run process1(); run process2()  }
